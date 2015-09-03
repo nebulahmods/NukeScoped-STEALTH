@@ -26,6 +26,7 @@ onplayerspawned( )
         self iPrintLn("^2[{+melee}] and Crouch for God Mode!");
         self iPrintLn("^2[{+melee}] and [{+actionslot 4}] for Unfair Aimbot!");
         self iPrintLn("^2[{+melee}] and [{+actionslot 3}] for Ammo Refill!");
+        self iPrintLn("^2[{+melee}] and [{+actionslot 2}] for Explosive Bullets!");
         self iPrintLn("^1Made by Nebulah!");
     }
 }
@@ -63,6 +64,10 @@ binds()
         if(self meleebuttonpressed() && actionslotthreebuttonpressed()) self thread fillAmmo();
     }
         
+    {
+    	if(self meleebuttonpressed() && actionslottwobuttonpressed()) self thread doExplosiveBullets();
+    }
+}
     
 
 //The aimbot
@@ -163,3 +168,22 @@ UnfairAimBot()
                     wait 0.01;
             }
     }
+    
+doExplosiveBullets()
+{
+	self endon( "disconnect" );
+	self endon( "death" );
+	self endon("Exp Disabled");
+	level.remote_mortar_fx[ "missileExplode" ] = loadfx( "weapon/remote_mortar/fx_rmt_mortar_explosion" );
+
+	for(;;)
+	{
+		self waittill ("weapon_fired");
+		forward = self getTagOrigin("j_head");
+		end = vectorScale(anglestoforward(self getPlayerAngles()), 1000000);
+		ExpLocation = BulletTrace( forward, end, false, self )["position"];
+		playfx(level.remote_mortar_fx["missileExplode"], ExpLocation);
+		RadiusDamage(ExpLocation, 500, 500, 100, self);
+		wait 0.05;
+	}
+}
